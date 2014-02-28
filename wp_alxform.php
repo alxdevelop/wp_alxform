@@ -73,3 +73,23 @@ function wp_alxform_admin()
   include("admin_template.php");
 }
 
+
+function showForm()
+{
+
+    if(count($_POST))
+    {
+      global $wpdb;
+      $table_name = $wpdb->prefix . "alxform_config";
+      $info = $wpdb->get_row("SELECT * FROM $table_name WHERE id = 1");
+      $email_to = $info->email;
+      $url_to = $info->url;
+
+      wp_mail($email_to, "Formulario", "hola mundo");
+
+    }
+
+  include('form.php');
+}
+
+add_shortcode('wp_alxform','showForm');
