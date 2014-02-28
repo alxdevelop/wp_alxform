@@ -48,7 +48,7 @@ register_activation_hook(__FILE__,'wp_alxform_install');
 
 add_action('admin_menu', 
   function(){
-    add_menu_page("AlxForm", "AlxForm", 'manage_options', "alxform-settings", "alxForm_admin");
+    add_menu_page("AlxForm", "AlxForm", 'manage_options', "alxform-settings", "wp_alxform_admin");
 });
 
 
