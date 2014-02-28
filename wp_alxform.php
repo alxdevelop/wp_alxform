@@ -63,10 +63,6 @@ function wp_alxform_admin()
     $alxform_email = trim($_POST['alxform_email']);
     $alxform_url = trim($_POST['alxform_url']);
     $wpdb->query("UPDATE $table_name SET email = '$alxform_email', url = '$alxform_url' WHERE id = 1");
-		/*$sf_email = $_POST['sf-email'];  
-		$sf_confirm = $_POST['sf-confirm'];  
-        update_option('simpleform-email', trim($sf_email));  
-    update_option('simpleform-confirmation-message', trim($sf_confirm));*/  
 		echo "<div class='updated'><p><strong>Configuración guardada</strong></p></div>";
 	}else {  
     $rows = $wpdb->get_row("SELECT * FROM $table_name WHERE id = 1");
