@@ -8,42 +8,75 @@ Version: 0.1
 Author URI:
 */
 
-global $db_version;
-$db_version = "0.1";
+global $alxform_db_version;
+$alxform_db_version = "0.1";
+
 
 function wp_alxform_install()
 {
   global $wpdb;
+  global $alxform_db_version;
+  //obtenemos la version de la DB instalada
+  $installed_ver = get_option("alxform_db_version");
 
-  $version_db = get_option('db_version');
+  add_option("alxform_db_version", $alxform_db_version);
 
-  add_option("db_version", $db_version);
 
-  if($version_db != $db_version)
+  if($installed_ver != $alxform_db_version)
   {
-    $table = $wpdb->prefix . "alxform_config";
 
+    //nombre de la tabla
+    $table_name = $wpdb->prefix . "alxform_config";
+    
+    //sql para crear tabla
     $sql = "CREATE TABLE $table_name (
       id int(11) NOT NULL AUTO_INCREMENT,
-      email varchar(99) NOT NULL,
-      url varchar(300) NOT NULL,
+      nombre varchar(99) NOT NULL,
+      valor varchar(300) NOT NULL,
       PRIMARY KEY (id)
     );";
 
-    if(!function_exists('dbDelta'))
-    {
-      require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    }
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
     dbDelta($sql);
 
-    update_option("db_version", $db_version);
-    
+    update_option("alxform_db_version", $alxform_db_version);
+  
   }
+
+
+    
+}
+
+
+
+function wp_alxform_install_data()
+{
+  global $wpdb;
+  $table_name = $wpdb->prefix . "alxform_config";
+
+  //add the admin email
+  $email_admin = get_option('admin_email');
+
+  //validamos que no existan esos campos
+  $email_exist = $wpdb->get_row("SELECT * FROM $table_name WHERE nombre = 'email'");
+  $url_exist = $wpdb->get_row("SELECT * FROM $table_name WHERE nombre = 'url'");
+
+  //insertamos valores por default si es que no existen
+  if(!isset($email_exist->nombre))
+  {
+    $wpdb->insert($table_name, array('nombre'=>'email','valor' => "$email_admin"));
+  }
+  if(!isset($url_exist->nombre))
+  {
+    $wpdb->insert($table_name, array('nombre'=>'url','valor' => ''));
+  }
+
 
 }
 
 register_activation_hook(__FILE__,'wp_alxform_install');
+register_activation_hook(__FILE__,'wp_alxform_install_data');
 
 
 add_action('admin_menu', 
@@ -62,12 +95,25 @@ function wp_alxform_admin()
 
     $alxform_email = trim($_POST['alxform_email']);
     $alxform_url = trim($_POST['alxform_url']);
-    $wpdb->query("UPDATE $table_name SET email = '$alxform_email', url = '$alxform_url' WHERE id = 1");
+    $wpdb->query("UPDATE $table_name SET valor = '$alxform_email' WHERE nombre = 'email'");
+    $wpdb->query("UPDATE $table_name SET valor = '$alxform_url' WHERE nombre = 'url'");
 		echo "<div class='updated'><p><strong>Configuración guardada</strong></p></div>";
 	}else {  
-    $rows = $wpdb->get_row("SELECT * FROM $table_name WHERE id = 1");
-    $alxform_email = $rows->email;
-    $alxform_url = $rows->url;
+    
+    $config = $wpdb->get_results("SELECT * FROM $table_name");
+
+      foreach($config as $conf)
+      {
+        if($conf->nombre == 'email')
+        {
+          $alxform_email = $conf->valor;  
+        }
+        else if($conf->nombre == 'url')
+        {
+          $alxform_url = $conf->valor;
+        }
+      }
+
     }  
 
   include("admin_template.php");
@@ -93,3 +139,4 @@ function showForm()
 }
 
 add_shortcode('wp_alxform','showForm');
+
