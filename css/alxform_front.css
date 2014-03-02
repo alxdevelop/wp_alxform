@@ -1,0 +1,23 @@
+.wrap_alxform
+{
+  width: 100%;
+}
+.wrap_alxform h3
+{
+  margin:.5rem 0 .5rem .5rem;
+}
+.wrap_alxform input,
+.wrap_alxform textarea,
+.wrap_alxform label,
+.wrap_alxform button 
+{
+  width: 90%;
+  margin-left:.5rem;
+  display: block;
+}
+.wrap_alxform button 
+{
+  padding:.5rem;
+  width:auto;
+  margin-top:1rem;
+}

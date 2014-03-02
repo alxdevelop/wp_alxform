@@ -134,6 +134,9 @@ function wp_alxform_admin()
 function showForm()
 {
 
+  wp_register_style('alxform_css_frontend',plugins_url('wp_alxform/css/alxform_front.css'));
+  wp_enqueue_style('alxform_css_frontend');
+
     global $wpdb;
     $table_name = $wpdb->prefix . "alxform_config";
 
