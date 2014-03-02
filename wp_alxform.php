@@ -8,6 +8,7 @@ Version: 0.1
 Author URI:
 */
 
+
 global $alxform_db_version;
 $alxform_db_version = "0.1";
 
@@ -61,6 +62,8 @@ function wp_alxform_install_data()
   //validamos que no existan esos campos
   $email_exist = $wpdb->get_row("SELECT * FROM $table_name WHERE nombre = 'email'");
   $url_exist = $wpdb->get_row("SELECT * FROM $table_name WHERE nombre = 'url'");
+  $title_exist = $wpdb->get_row("SELECT * FROM $table_name WHERE nombre = 'title'");
+  $button_exist = $wpdb->get_row("SELECT * FROM $table_name WHERE nombre = 'button'");
 
   //insertamos valores por default si es que no existen
   if(!isset($email_exist->nombre))
@@ -70,6 +73,14 @@ function wp_alxform_install_data()
   if(!isset($url_exist->nombre))
   {
     $wpdb->insert($table_name, array('nombre'=>'url','valor' => ''));
+  }
+  if(!isset($title_exist->nombre))
+  {
+    $wpdb->insert($table_name, array('nombre'=>'title','valor' => 'Contactanos'));
+  }
+  if(!isset($button_exist->nombre))
+  {
+    $wpdb->insert($table_name, array('nombre'=>'button','valor' => 'Enviar'));
   }
 
 
@@ -123,10 +134,27 @@ function wp_alxform_admin()
 function showForm()
 {
 
+    global $wpdb;
+    $table_name = $wpdb->prefix . "alxform_config";
+
+    //obtenemos el valor del titulo
+    $title = $wpdb->get_row("SELECT valor FROM $table_name WHERE nombre = 'title'");
+    if($title == ''){ 
+      $title = 'Contacto';
+    }else{
+      $title = $title->valor;
+    }
+
+    //obtenemos el valor del texto del boton
+    $button = $wpdb->get_row("SELECT valor FROM $table_name WHERE nombre = 'button'");
+    if($button == ''){ 
+      $button = 'Enviar';
+    }else{
+      $button = $button->valor;
+    }
+
     if(count($_POST))
     {
-      global $wpdb;
-      $table_name = $wpdb->prefix . "alxform_config";
       $info = $wpdb->get_row("SELECT * FROM $table_name WHERE id = 1");
       $email_to = $info->email;
       $url_to = $info->url;
@@ -140,3 +168,4 @@ function showForm()
 
 add_shortcode('wp_alxform','showForm');
 
+//include_once dirname(__FILE__) . '/alxform_widget.php';
