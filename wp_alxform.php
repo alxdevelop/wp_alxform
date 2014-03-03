@@ -200,4 +200,4 @@ function showForm()
 
 add_shortcode('wp_alxform','showForm');
 
-//include_once dirname(__FILE__) . '/alxform_widget.php';
+include_once dirname(__FILE__) . '/alxform_widget.php';
