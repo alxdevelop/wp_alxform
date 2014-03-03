@@ -102,12 +102,18 @@ function wp_alxform_admin()
     $table_name = $wpdb->prefix . "alxform_config";
     $alxform_email = "";
     $alxform_url = "";
+    $alxform_title = "";
+    $alxform_button = "";
 	if(count($_POST) > 0){
 
     $alxform_email = trim($_POST['alxform_email']);
     $alxform_url = trim($_POST['alxform_url']);
+    $alxform_title = trim($_POST['alxform_title']);
+    $alxform_button = trim($_POST['alxform_button']);
     $wpdb->query("UPDATE $table_name SET valor = '$alxform_email' WHERE nombre = 'email'");
     $wpdb->query("UPDATE $table_name SET valor = '$alxform_url' WHERE nombre = 'url'");
+    $wpdb->query("UPDATE $table_name SET valor = '$alxform_title' WHERE nombre = 'title'");
+    $wpdb->query("UPDATE $table_name SET valor = '$alxform_button' WHERE nombre = 'button'");
 		echo "<div class='updated'><p><strong>Configuración guardada</strong></p></div>";
 	}else {  
     
@@ -123,6 +129,14 @@ function wp_alxform_admin()
         {
           $alxform_url = $conf->valor;
         }
+        else if($conf->nombre == 'title')
+        {
+          $alxform_title = $conf->valor;
+        }
+        else if($conf->nombre == 'button')
+        {
+          $alxform_button = $conf->valor;
+        }
       }
 
     }  
@@ -134,8 +148,13 @@ function wp_alxform_admin()
 function showForm()
 {
 
+  //agregamos los estilos CSS 
   wp_register_style('alxform_css_frontend',plugins_url('wp_alxform/css/alxform_front.css'));
   wp_enqueue_style('alxform_css_frontend');
+
+  //agregamos los JS
+  wp_register_script('alxform_js_frontend',plugins_url('wp_alxform/js/alxform_form.js'));
+  wp_enqueue_script('alxform_js_frontend',array('jquery'));
 
     global $wpdb;
     $table_name = $wpdb->prefix . "alxform_config";
@@ -158,11 +177,21 @@ function showForm()
 
     if(count($_POST))
     {
-      $info = $wpdb->get_row("SELECT * FROM $table_name WHERE id = 1");
-      $email_to = $info->email;
-      $url_to = $info->url;
+      $info = $wpdb->get_results("SELECT * FROM $table_name");
+      //var_dump($info);
+      foreach ($info as $data) {
+        if($data->nombre == 'email')
+        {
+          $email_to = $data->valor;
+        }
+        else if($data->nombre == 'url')
+        {
+          $url_to = $data->valor;
+        }
+      }
 
       wp_mail($email_to, "Formulario", "hola mundo");
+
 
     }
 
