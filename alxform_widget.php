@@ -36,7 +36,7 @@ class Alxform_Widget extends WP_Widget
     <?php echo $before_widget; ?>
       <?php if ($title)
         echo $before_title . $title . $after_title; ?>
-      Hello World with widgets!
+      <?php include('form.php') ?>
     <?php echo $after_widget; ?>
   <?php
   }
